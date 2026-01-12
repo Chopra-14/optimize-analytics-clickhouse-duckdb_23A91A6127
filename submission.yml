@@ -1,0 +1,31 @@
+version: "1.0"
+
+setup:
+  - name: Install Python dependencies
+    command: pip install -r requirements.txt
+
+  - name: Start ClickHouse using Docker
+    command: docker compose -f docker/docker-compose.yml up -d
+
+  - name: Wait for ClickHouse to be ready
+    command: sleep 30
+
+pipeline:
+  - name: Ingest baseline data into ClickHouse
+    command: python scripts/ingest_clickhouse_baseline.py
+
+  - name: Run baseline benchmarks
+    command: python scripts/benchmark_baseline.py
+
+  - name: Ingest optimized data into ClickHouse
+    command: python scripts/ingest_clickhouse_optimized.py
+
+  - name: Run optimized benchmarks
+    command: python scripts/benchmark_optimized.py
+
+  - name: Validate materialized view correctness
+    command: python scripts/validate_mv.py
+
+artifacts:
+  - results/baseline_benchmark_results.csv
+  - results/optimized_benchmark_results.csv
