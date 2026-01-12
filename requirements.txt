@@ -1,0 +1,5 @@
+clickhouse-connect
+duckdb
+pandas
+pyarrow
+matplotlib
